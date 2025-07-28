@@ -5,6 +5,8 @@ from shapely.geometry import Polygon
 import numpy as np
 import folium
 from folium.plugins import HeatMap
+import os
+import io
 
 
 # This program takes a CSV file with latitude and longitude coordinates as input,
@@ -150,22 +152,29 @@ def create_continental_us_boundary_with_margin(shapefile_path, buffer_meters=500
 
 
 # --- SOURCE FILES AND COLUMNS CONFIGURED HERE --- #
-source_data_csv = 'source_data.csv'
 source_lat_col = 'lat'
 source_lon_col = 'long'
-output_html_file = 'anonymous_heatmap.html'
+
+# Save output to a dedicated folder
+output_dir = 'public'
+output_html_file = os.path.join(output_dir, 'anonymous_heatmap.html')
 
 # Path to the unzipped US boundary shapefile (.shp), 2018 is most current as of today (07.21.25)
 # 5m version is sufficient for this use case
 # Ensure source file and shp file are in the same directory, or use absolute paths
-us_shapefile = 'cb_2018_us_nation_5m.shp' 
-
+us_shapefile = 'data/cb_2018_us_nation_5m.shp' 
 PRIVACY_RADIUS_METERS = 500
 
 
 try:
+
+    csv_data_string = os.getenv('MEMBER_DATA_CSV')
+    if not csv_data_string:
+        raise ValueError("Environment variable 'MEMBER_DATA_CSV' is not set. Please provide the CSV data.")
+    
+    source_df = pd.read_csv(io.StringIO(csv_data_string))
+    
     # 1. Create the boundary to check against
-    # us_boundary = create_continental_us_boundary(us_shapefile)
     us_boundary = create_continental_us_boundary_with_margin(us_shapefile, buffer_meters=5000)
 
     # Put the single boundary polygon into a GeoDataFrame for the spatial join
