@@ -20,7 +20,7 @@ def create_continental_us_boundary(shapefile_path):
     Loads a US nation shapefile and returns a polygon for the continental US
     by finding the largest polygon by area.
     """
-    print("🌍 Loading US boundary shapefile...")
+    print("Loading US boundary shapefile...")
     us_gdf = gpd.read_file(shapefile_path)
 
     # The 'nation' file has one row. Get its geometry object.
@@ -38,7 +38,7 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
     """
     Applies a random offset to coordinates using a fast, vectorized approach.
     """
-    print(f"🚀 Starting fast, vectorized jittering for {len(df)} records...")
+    print(f"Starting fast, vectorized jittering for {len(df)} records...")
     
     # 1. Jitter ALL points at once (vectorized)
     earth_radius = 6378137
@@ -74,7 +74,7 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
     invalid_indices = jittered_df[~jittered_df['original_index'].isin(valid_points['original_index'])].original_index
     
     if not invalid_indices.empty:
-        print(f"🛠️  Found {len(invalid_indices)} points outside the boundary. Re-processing them...")
+        print(f"Found {len(invalid_indices)} points outside the boundary. Re-processing them...")
         # Fall back to the slower, iterative method ONLY for these few points
         fixed_points_df = jitter_coordinates_with_boundary(df.loc[invalid_indices], lat_col, lon_col, offset_meters, boundary)
         
@@ -84,17 +84,17 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
             fixed_points_df
         ], ignore_index=True)
     else:
-        print("✅ All points were generated within the boundary on the first try!")
+        print("All points were generated within the boundary on the first try!")
         final_df = valid_points[['lat_jittered', 'lon_jittered']]
 
-    print(f"✅ Fast anonymization complete for {len(final_df)} records.")
+    print(f"Fast anonymization complete for {len(final_df)} records.")
     return final_df
 
 def jitter_coordinates_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
     """
     Applies a random offset to coordinates, ensuring they stay within the provided boundary.
     """
-    print(f"🔀 Applying bounded offset of up to {offset_meters} meters...")
+    print(f"Applying bounded offset of up to {offset_meters} meters...")
     earth_radius = 6378137
     jittered_points = []
 
@@ -125,7 +125,7 @@ def jitter_coordinates_with_boundary(df, lat_col, lon_col, offset_meters, bounda
                 jittered_points.append({'lat_jittered': new_lat, 'lon_jittered': new_lon})
                 break # Exit the while loop and move to the next member
     
-    print(f"✅ Anonymization complete for {len(jittered_points)} records.")
+    print(f"Anonymization complete for {len(jittered_points)} records.")
     return pd.DataFrame(jittered_points)
 
 
@@ -134,7 +134,7 @@ def create_continental_us_boundary_with_margin(shapefile_path, buffer_meters=500
     Loads a US nation shapefile and returns a polygon for the continental US
     with an optional buffer (margin) applied to the boundary.
     """
-    print("🌍 Loading US boundary shapefile...")
+    print("Loading US boundary shapefile...")
     us_gdf = gpd.read_file(shapefile_path)
 
     # The 'nation' file has one row. Get its geometry object.
@@ -152,17 +152,10 @@ def create_continental_us_boundary_with_margin(shapefile_path, buffer_meters=500
     return buffered_polygon
 
 
-# --- SOURCE FILES AND COLUMNS CONFIGURED HERE --- #
 source_lat_col = 'lat'
 source_lon_col = 'long'
-
-# Save output to a dedicated folder
 output_dir = 'public'
 output_html_file = os.path.join(output_dir, 'anonymous_heatmap.html')
-
-# Path to the unzipped US boundary shapefile (.shp), 2018 is most current as of today (07.21.25)
-# 5m version is sufficient for this use case
-# Ensure source file and shp file are in the same directory, or use absolute paths
 us_shapefile = 'data/cb_2018_us_nation_5m.shp' 
 PRIVACY_RADIUS_METERS = 500
 
@@ -182,19 +175,23 @@ try:
         aws_secret_access_key=aws_secret
     )
 
-    # 1. Create the boundary to check against
+    # 1. Create the US boundary to check against
     us_boundary = create_continental_us_boundary_with_margin(us_shapefile, buffer_meters=5000)
 
-    # Put the single boundary polygon into a GeoDataFrame for the spatial join
+    # Put the single boundary polygon into a GeoDataFrame for spatial join
     boundary_gdf = gpd.GeoDataFrame([{'geometry': us_boundary}], crs="EPSG:4326")
 
-    # 2. Load source data
-    source_df = pd.read_csv(source_data_csv)
-    source_df.dropna(subset=[source_lat_col, source_lon_col], inplace=True)
-    print(f"✅ Loaded {len(source_df)} total records with coordinates.")
+    # 2. Get source data from S3 and load it into dataframe
+    s3_object = s3_client.get_object(Bucket=bucket_name, Key=file_key)
+    csv_data = s3_object['Body'].read()
 
-    # 3. PRE-FILTER: Keep only points already inside the continental US boundary
-    print("🌎 Pre-filtering source data to find points within the continental US...")
+    source_df = pd.read_csv(io.BytesIO(csv_data))
+    source_df.dropna(subset=[source_lat_col, source_lon_col], inplace=True)
+
+    print(f"Loaded {len(source_df)} total records with coordinates.")
+
+    # 3. Keep only points already inside the US boundary
+    print("Pre-filtering source data to find points within the continental US...")
     source_gdf = gpd.GeoDataFrame(
         source_df,
         geometry=gpd.points_from_xy(source_df[source_lon_col], source_df[source_lat_col]),
@@ -208,9 +205,9 @@ try:
     filtered_count = len(continental_us_members)
     discarded_count = original_count - filtered_count
 
-    print(f"👍 Kept {filtered_count} records within the continental US boundary.")
+    print(f"Kept {filtered_count} records within the continental US boundary.")
     if discarded_count > 0:
-        print(f"🗑️  Discarded {discarded_count} records located outside the boundary (e.g., AK, HI, PR, or data errors).")
+        print(f"Discarded {discarded_count} records located outside the boundary (e.g., AK, HI, PR, or data errors).")
 
     # 4. Anonymize ONLY the pre-filtered data
     if filtered_count > 0:
@@ -253,11 +250,11 @@ try:
 
         # 6. Save Map
         m.save(output_html_file)
-        print(f"✅ Heatmap saved to '{output_html_file}'.")
+        print(f"Heatmap saved to '{output_html_file}'.")
     else:
-        print("⚠️ No source data points were found within the continental US. Cannot generate a heatmap.")
+        print("No source data points were found within the continental US. Cannot generate a heatmap.")
 
 except FileNotFoundError:
-    print(f"❌Error: A required file was not found. Check paths for '{source_data_csv}' and '{us_shapefile}'.")
+    print(f"Error: A required file was not found. Check paths for '{csv_data}' and '{us_shapefile}'.")
 except Exception as e:
     print(f"An unexpected error occurred: {e}")
