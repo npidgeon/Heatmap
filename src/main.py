@@ -14,6 +14,7 @@ import boto3
 # applies a random jitter to anonymize the coordinates, and generates a heatmap
 # of the anonymized points, ensuring they remain within the continental US boundary.
 # Heatmap is an HTML file that can be opened in a web browser.
+# Last updated on July 28th, 2025
 
 def create_continental_us_boundary(shapefile_path):
     """
