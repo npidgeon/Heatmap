@@ -7,6 +7,7 @@ import folium
 from folium.plugins import HeatMap
 import os
 import io
+import boto3
 
 
 # This program takes a CSV file with latitude and longitude coordinates as input,
@@ -167,13 +168,20 @@ PRIVACY_RADIUS_METERS = 500
 
 
 try:
+    aws_key = os.getenv('HEATMAP_AWS_ACCESS_KEY_ID')
+    aws_secret = os.getenv('HEATMAP_AWS_SECRET_ACCESS_KEY')
+    bucket_name = os.getenv('HEATMAP_S3_BUCKET_NAME')
+    file_key = os.getenv('HEATMAP_S3_FILE_KEY')
 
-    csv_data_string = os.getenv('MEMBER_DATA_CSV')
-    if not csv_data_string:
-        raise ValueError("Environment variable 'MEMBER_DATA_CSV' is not set. Please provide the CSV data.")
-    
-    source_df = pd.read_csv(io.StringIO(csv_data_string))
-    
+    if not all([aws_key, aws_secret, bucket_name, file_key]):
+        raise ValueError("Missing required AWS environment variables for S3 access.")
+
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=aws_key,
+        aws_secret_access_key=aws_secret
+    )
+
     # 1. Create the boundary to check against
     us_boundary = create_continental_us_boundary_with_margin(us_shapefile, buffer_meters=5000)
 
