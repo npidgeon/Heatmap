@@ -229,8 +229,8 @@ try:
             zoom_start=5, 
             tiles='CartoDB positron', 
             max_bounds=map_bounds, 
-            min_zoom=4
-            zoom_delta=0.25
+            min_zoom=4,
+            zoom_delta=0.25,
             zoom_snap=0.25
         )
         m.fit_bounds(map_bounds)
