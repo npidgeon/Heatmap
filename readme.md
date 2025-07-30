@@ -1,14 +1,17 @@
 # Anonymous US Density Heatmap from CSV 
 
 This is a simple Python script that uses a CSV file of coordinates in conjunction with US national 
-shapefile data to plot a density heatmap using Folium. Coordinates are jittered using a random offset 
+shapefile data to generate a density heatmap using Folium, pandas/geopandas and LeafletJS. Coordinates are jittered using a random offset 
 of up to 500 meters, adding some anonymity while preserving the general location of each point. Currently, 
 the script uses national shapefile data (accessed at https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_nation_5m.zip), 
-and will display coordinates in Hawaii, Alaska, and US territories. 
+and will display coordinates in Hawaii, Alaska, and US territories. The output is an HTML file.
 
 It's configured to work with the CSV file in an S3 bucket (using boto3 functions to access) for anonymity's sake, 
 but you can also place a CSV in the data directory on your machine, change the csv_data initialization on line 187 
-to the filepath, for example "data/source_data.csv" and comment out the AWS-related lines (165-177, 186).
+to the filepath, for example "data/source_data.csv" and comment out the AWS-related lines (165-177, 186). 
+
+If anonymity isn't a concern, you can simply set the PRIVACY_RADIUS_METERS variable to 0. Note that
+all coordinates are easily accessible in the HTML file.
 
 ## Prerequisites
 
