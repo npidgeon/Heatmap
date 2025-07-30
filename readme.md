@@ -12,10 +12,10 @@ to the filepath, for example "data/source_data.csv" and comment out the AWS-rela
 
 ## Prerequisites
 
-pandas
-geopandas
-folium
-boto3
+pandas,
+geopandas,
+folium,
+boto3,
 numpy
 
 You can install the required Python packages using pip:
