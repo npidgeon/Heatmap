@@ -27,17 +27,21 @@ Ensure that a CSV with proper column names ('lat' and 'long' are defaults) is in
 This script reads AWS credentials from your environment variables. Before running, set the following variables
 in your terminal:
 
---Unix--
+For **bash**, **zsh**, etc:
+```bash
 export HEATMAP_AWS_ACCESS_KEY_ID="YOUR_KEY_HERE"
 export HEATMAP_AWS_SECRET_ACCESS_KEY="YOUR_SECRET_HERE"
 export HEATMAP_S3_BUCKET_NAME="your-bucket-name"
 export HEATMAP_S3_FILE_KEY="path/to/your/file.csv"
+```
 
---PowerShell--
+For PowerShell:
+```powershell
 $env:HEATMAP_AWS_ACCESS_KEY_ID="YOUR_KEY_HERE"
 $env:HEATMAP_AWS_SECRET_ACCESS_KEY="YOUR_SECRET_HERE"
 $env:HEATMAP_S3_BUCKET_NAME="your-bucket-name"
 $env:HEATMAP_S3_FILE_KEY="path/to/your/file.csv"
+```
 
 Filecheck.py can be used to confirm that you have a valid shapefile and display the column names, 
 but shouldn't be necessary unless you've modified something or are using state/regional shapefiles instead of the national .shp.
