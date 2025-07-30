@@ -28,16 +28,16 @@ This script reads AWS credentials from your environment variables. Before runnin
 in your terminal:
 
 --Unix--
-    export HEATMAP_AWS_ACCESS_KEY_ID="YOUR_KEY_HERE"
-    export HEATMAP_AWS_SECRET_ACCESS_KEY="YOUR_SECRET_HERE"
-    export HEATMAP_S3_BUCKET_NAME="your-bucket-name"
-    export HEATMAP_S3_FILE_KEY="path/to/your/file.csv"
+export HEATMAP_AWS_ACCESS_KEY_ID="YOUR_KEY_HERE"
+export HEATMAP_AWS_SECRET_ACCESS_KEY="YOUR_SECRET_HERE"
+export HEATMAP_S3_BUCKET_NAME="your-bucket-name"
+export HEATMAP_S3_FILE_KEY="path/to/your/file.csv"
 
 --PowerShell--
-    $env:HEATMAP_AWS_ACCESS_KEY_ID="YOUR_KEY_HERE"
-    $env:HEATMAP_AWS_SECRET_ACCESS_KEY="YOUR_SECRET_HERE"
-    $env:HEATMAP_S3_BUCKET_NAME="your-bucket-name"
-    $env:HEATMAP_S3_FILE_KEY="path/to/your/file.csv"
+$env:HEATMAP_AWS_ACCESS_KEY_ID="YOUR_KEY_HERE"
+$env:HEATMAP_AWS_SECRET_ACCESS_KEY="YOUR_SECRET_HERE"
+$env:HEATMAP_S3_BUCKET_NAME="your-bucket-name"
+$env:HEATMAP_S3_FILE_KEY="path/to/your/file.csv"
 
 Filecheck.py can be used to confirm that you have a valid shapefile and display the column names, 
 but shouldn't be necessary unless you've modified something or are using state/regional shapefiles instead of the national .shp.
@@ -45,7 +45,7 @@ but shouldn't be necessary unless you've modified something or are using state/r
 
 ## Example
 
-
+https://github.com/user-attachments/assets/22def057-d6b3-4a51-bf61-24a40338c3e0
 
 
 ##  Contributing / Updates
