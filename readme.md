@@ -25,7 +25,6 @@ adding better handling for state/regional/international scope, including comment
 source data instead of S3, and refining the color scheme, blur/radius settings, and legend to optimize readability and visual appeal.
 
 ## License
-
 MIT License
 
 Copyright (c) 2025 Nicholas Pidgeon
