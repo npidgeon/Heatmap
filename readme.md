@@ -45,7 +45,7 @@ but shouldn't be necessary unless you've modified something or are using state/r
 
 ## Example
 
-https://github.com/user-attachments/assets/22def057-d6b3-4a51-bf61-24a40338c3e0
+<img width="1317" height="1010" alt="Image" src="https://github.com/user-attachments/assets/22def057-d6b3-4a51-bf61-24a40338c3e0" />
 
 
 ##  Contributing / Updates
