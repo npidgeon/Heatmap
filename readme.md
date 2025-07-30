@@ -26,5 +26,7 @@ source data instead of S3, and refining the color scheme, blur/radius settings, 
 
 ## License
 
+MIT License
 
+Copyright (c) 2025 Nicholas Pidgeon
 
