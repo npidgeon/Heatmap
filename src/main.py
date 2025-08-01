@@ -17,10 +17,10 @@ import boto3
 # Last updated on July 28th, 2025
 
 def create_continental_us_boundary(shapefile_path):
-    """
-    Loads a US nation shapefile and returns a polygon for the continental US
-    by finding the largest polygon by area.
-    """
+    
+    # Loads a US nation shapefile and returns a polygon for the continental US
+    # by finding the largest polygon by area.
+    
     print("Loading US boundary shapefile...")
     us_gdf = gpd.read_file(shapefile_path)
 
@@ -36,9 +36,9 @@ def create_continental_us_boundary(shapefile_path):
     return largest_polygon
 
 def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
-    """
-    Applies a random offset to coordinates using a fast, vectorized approach.
-    """
+    
+    # Applies a random offset to coordinates using a fast, vectorized approach.
+    
     print(f"Starting fast, vectorized jittering for {len(df)} records...")
     
     # 1. Jitter ALL points at once (vectorized)
@@ -92,9 +92,9 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
     return final_df
 
 def jitter_coordinates_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
-    """
-    Applies a random offset to coordinates, ensuring they stay within the provided boundary.
-    """
+    
+    # Applies a random offset to coordinates, ensuring they stay within the provided boundary.
+    # This is a slower, iterative method used only for points that failed the fast vectorized check.
     print(f"Applying bounded offset of up to {offset_meters} meters...")
     earth_radius = 6378137
     jittered_points = []
@@ -131,10 +131,10 @@ def jitter_coordinates_with_boundary(df, lat_col, lon_col, offset_meters, bounda
 
 
 def create_continental_us_boundary_with_margin(shapefile_path, buffer_meters=5000):
-    """
-    Loads a US nation shapefile and returns a polygon for the continental US
-    with an optional buffer (margin) applied to the boundary.
-    """
+    ###
+    # Loads a US nation shapefile and returns a polygon for the continental US
+    # with an optional buffer (margin) applied to the boundary.
+    ###
     print("Loading US boundary shapefile...")
     us_gdf = gpd.read_file(shapefile_path)
 
