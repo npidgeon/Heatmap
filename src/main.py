@@ -41,7 +41,7 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
     
     print(f"Starting fast, vectorized jittering for {len(df)} records...")
     
-    # 1. Jitter ALL points at once (vectorized)
+    # Jitter ALL points at once (vectorized)
     earth_radius = 6378137
     random_distances = np.sqrt(np.random.uniform(0, 1, size=len(df))) * offset_meters
     random_angles = np.random.uniform(0, 2 * np.pi, size=len(df))
@@ -59,7 +59,7 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
         'original_index': df.index # Keep track of original position
     })
     
-    # 2. Convert to a GeoDataFrame to perform a single, fast spatial check
+    # Convert to a GeoDataFrame to perform a single, fast spatial check
     gdf_jittered = gpd.GeoDataFrame(
         jittered_df, 
         geometry=gpd.points_from_xy(jittered_df.lon_jittered, jittered_df.lat_jittered),
@@ -68,10 +68,10 @@ def fast_jitter_with_boundary(df, lat_col, lon_col, offset_meters, boundary):
     
     boundary_gdf = gpd.GeoDataFrame([{'geometry': boundary}], crs="EPSG:4326")
 
-    # 3. Use a spatial join to find all points inside the boundary at once
+    # Use a spatial join to find all points inside the boundary at once
     valid_points = gpd.sjoin(gdf_jittered, boundary_gdf, how="inner", predicate="within")
     
-    # 4. Identify the small number of invalid points that need to be fixed
+    # Identify the small number of invalid points that need to be fixed
     invalid_indices = jittered_df[~jittered_df['original_index'].isin(valid_points['original_index'])].original_index
     
     if not invalid_indices.empty:
@@ -119,12 +119,12 @@ def jitter_coordinates_with_boundary(df, lat_col, lon_col, offset_meters, bounda
             # Create the new point
             new_lat = original_lat + lat_offset_deg
             new_lon = original_lon + lon_offset_deg
-            new_point = Point(new_lon, new_lat) # Note: Shapely uses (lon, lat) order
+            new_point = Point(new_lon, new_lat) 
 
             # Check if the point is inside the boundary
             if boundary.contains(new_point):
                 jittered_points.append({'lat_jittered': new_lat, 'lon_jittered': new_lon})
-                break # Exit the while loop and move to the next member
+                break
     
     print(f"Anonymization complete for {len(jittered_points)} records.")
     return pd.DataFrame(jittered_points)
@@ -176,13 +176,13 @@ try:
         aws_secret_access_key=aws_secret
     )
 
-    # 1. Create the US boundary to check against
+    # Create the US boundary to check against
     us_boundary = create_continental_us_boundary_with_margin(us_shapefile, buffer_meters=5000)
 
     # Put the single boundary polygon into a GeoDataFrame for spatial join
     boundary_gdf = gpd.GeoDataFrame([{'geometry': us_boundary}], crs="EPSG:4326")
 
-    # 2. Get source data from S3 and load it into dataframe
+    # Get source data from S3 and load it into dataframe
     s3_object = s3_client.get_object(Bucket=bucket_name, Key=file_key)
     csv_data = s3_object['Body'].read()
 
@@ -191,7 +191,7 @@ try:
 
     print(f"Loaded {len(source_df)} total records with coordinates.")
 
-    # 3. Keep only points already inside the US boundary
+    # Keep only points already inside the US boundary
     print("Pre-filtering source data to find points within the continental US...")
     source_gdf = gpd.GeoDataFrame(
         source_df,
@@ -210,7 +210,7 @@ try:
     if discarded_count > 0:
         print(f"Discarded {discarded_count} records located outside the boundary (e.g., AK, HI, PR, or data errors).")
 
-    # 4. Anonymize ONLY the pre-filtered data
+    # Anonymize ONLY pre-filtered data
     if filtered_count > 0:
         anonymized_df = fast_jitter_with_boundary(
             continental_us_members.drop(columns=['index_right']), # Drop column added by sjoin
@@ -220,7 +220,7 @@ try:
             us_boundary
         )
 
-        # 5. Create Heatmap
+        # Create heatmap
         map_center = [39.82, -98.57]
         map_bounds = [[24, -125], [50, -66]] # Approx. bounds for continental US
 
@@ -251,7 +251,7 @@ try:
             '''
         m.get_root().html.add_child(folium.Element(legend_html))
 
-        # 6. Save Map
+        # Save Map
         m.save(output_html_file)
         print(f"Heatmap saved to '{output_html_file}'.")
     else:
